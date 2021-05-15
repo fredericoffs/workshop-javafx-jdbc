@@ -50,7 +50,8 @@ public class DepartmentListController implements Initializable {
 	public void onBtNewAction(ActionEvent event) {
 		// referência para o stage atual
 		Stage parentStage = Utils.currentStage(event);
-		createDialogForm("/gui/DepartmentForm.fxml", parentStage);
+		Department department = new Department();
+		createDialogForm(department, "/gui/DepartmentForm.fxml", parentStage);
 	}
 
 	public void setDepartmentService(DepartmentService service) {
@@ -85,11 +86,17 @@ public class DepartmentListController implements Initializable {
 		tableViewDepartment.setItems(obsList);
 	}
 
-	private void createDialogForm(String absoluteName, Stage parentStage) {
+	private void createDialogForm(Department obj, String absoluteName, Stage parentStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			// carregou o painel
 			Pane pane = loader.load();
+
+			// injetar o obj Department no controlador da tela (DepartmentFormController)
+			DepartmentFormController controller = loader.getController();
+			controller.setDepartment(obj);
+			// carregar os dados de obj no Form
+			controller.updateFormData();
 
 			// carregar uma tela modal precisa de um novo stage
 			Stage dialogStage = new Stage();
