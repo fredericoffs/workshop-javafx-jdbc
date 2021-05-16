@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
@@ -23,6 +25,14 @@ public class Utils {
 	public static Integer tryParseToInt(String str) {
 		try {
 			return Integer.parseInt(str);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	public static Double tryParseToDouble(String str) {
+		try {
+			return Double.parseDouble(str);
 		} catch (NumberFormatException e) {
 			return null;
 		}
@@ -87,6 +97,18 @@ public class Utils {
 					return LocalDate.parse(string, dateFormatter);
 				} else {
 					return null;
+				}
+			}
+		});
+	}
+
+	public static void onChangeDatePicker(DatePicker datePicker) {
+		// Resolve o problema do DatePicker ficar null quando digita a data manualmente
+		datePicker.focusedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				if (!newValue) {
+					datePicker.setValue(datePicker.getConverter().fromString(datePicker.getEditor().getText()));
 				}
 			}
 		});

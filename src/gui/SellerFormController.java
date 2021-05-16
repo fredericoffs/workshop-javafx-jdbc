@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -15,6 +17,8 @@ import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
 import gui.util.Constraints;
 import gui.util.Utils;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -130,6 +134,7 @@ public class SellerFormController implements Initializable {
 
 		ValidationException exception = new ValidationException("Validation Exception");
 
+		// caso não seja int deixar vazio
 		obj.setId(Utils.tryParseToInt(textId.getText()));
 
 		// valida o campo textName ValidationException
@@ -138,6 +143,29 @@ public class SellerFormController implements Initializable {
 		}
 
 		obj.setName(textName.getText());
+
+		if (textEmail.getText() == null || textEmail.getText().equals("")) {
+			exception.addError("email", "Field can`t be empty");
+		}
+
+		obj.setEmail(textEmail.getText());
+
+		if (datePickerBirthDate.getValue() == null) {
+			exception.addError("birthDate", "Field can`t be empty");
+		} else {
+			// Pegar o valor que está no datePicker no form
+			Instant instant = Instant.from(datePickerBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setBirthDate(Date.from(instant));
+		}
+
+		if (textBaseSalary.getText() == null || textBaseSalary.getText().equals("")) {
+			exception.addError("baseSalary", "Field can`t be empty");
+		}
+
+		// caso não seja double deixar vazio
+		obj.setBaseSalary(Utils.tryParseToDouble(textBaseSalary.getText()));
+
+		obj.setDepartment(comboBoxDepartment.getValue());
 
 		// lança a exceção
 		if (exception.getErrors().size() > 0) {
@@ -166,6 +194,9 @@ public class SellerFormController implements Initializable {
 
 		// inicializar o comboBox
 		initializeComboBoxDepartment();
+		
+		// verifica se foi digitado a data ao invés de selecionado pelo datePicker
+		Utils.onChangeDatePicker(datePickerBirthDate);
 	}
 
 	public void updateFormData() {
@@ -213,10 +244,10 @@ public class SellerFormController implements Initializable {
 	private void setErrorMessages(Map<String, String> errors) {
 		Set<String> fields = errors.keySet();
 
-		if (fields.contains("name")) {
-			labelErrorName.setText(errors.get("name"));
-		}
-
+		labelErrorName.setText((fields.contains("name")) ? errors.get("name") : "");
+		labelErrorEmail.setText((fields.contains("email")) ? errors.get("email") : "");
+		labelErrorBaseSalary.setText((fields.contains("baseSalary")) ? errors.get("baseSalary") : "");
+		labelErrorBirthDate.setText((fields.contains("birthDate")) ? errors.get("birthDate") : "");
 	}
 
 	private void initializeComboBoxDepartment() {
