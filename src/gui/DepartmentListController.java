@@ -92,9 +92,10 @@ public class DepartmentListController implements Initializable {
 			// carregou o painel
 			Pane pane = loader.load();
 
-			// injetar o obj Department no controlador da tela (DepartmentFormController)
 			DepartmentFormController controller = loader.getController();
+			// injetar o obj Department no controlador da tela (DepartmentFormController)
 			controller.setDepartment(obj);
+			controller.setDepartmentService(new DepartmentService());
 			// carregar os dados de obj no Form
 			controller.updateFormData();
 
